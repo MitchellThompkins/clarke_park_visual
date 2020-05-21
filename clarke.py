@@ -1,10 +1,26 @@
 import math
+import sys
+import traceback
 
 class Error(Exception):
     pass
 
 class BalanceError(Error):
-    pass
+        def __init__(self, transform, *inputs):
+            self.vals = []
+            for v in inputs:
+                self.vals.append(v)
+
+            code = "Balanced input violated, a+b+c != 0\n"
+            code = code + "transform: " + transform + "\n"
+            self.code = code + "Got: "
+
+            for v in self.vals:
+                self.code = self.code + " " + str(v)
+
+        def __str__(self):
+            return repr(self.code)
+
 
 #Definition of clarke transform: 
 #https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_transformation
@@ -57,11 +73,11 @@ class clarke:
 
         try:
             if a is None:
-                raise BalanceError
+                raise BalanceError("alpha",a)
             elif b is None and c is not None:
-                raise BalanceError
+                raise BalanceError("alpha",b,c)
             elif c is None and b is not None:
-                raise BalanceError
+                raise BalanceError("alpha",c,b)
             elif b is None and c is None:
                 return a
             elif clarke.checkBalance(a,b,c):
@@ -69,8 +85,10 @@ class clarke:
             else:
                 return alpha_unbal(a,b,c)
 
-        except BalanceError:
-            print("Balanced value violated")
+        except BalanceError as e:
+            #print(traceback.print_exc())
+            print(e.code)
+            sys.exit(1)
 
     @staticmethod
     @scale
@@ -83,7 +101,7 @@ class clarke:
 
         try:
             if a is None or b is None:
-                raise BalanceError
+                raise BalanceError("beta",a,b)
             elif c is None:
                 return (math.sqrt(3)*(a+b)/3) + (math.sqrt(3)*b/3)
             elif clarke.checkBalance(a,b,c):
@@ -91,8 +109,10 @@ class clarke:
             else:
                 return beta_unbal(b,c)
 
-        except BalanceError:
-            print("Balanced value violated")
+        except BalanceError as e:
+            #print(traceback.print_exc())
+            print(e.code)
+            sys.exit(1)
 
     @staticmethod
     @scale
@@ -105,25 +125,28 @@ class clarke:
 
         try:
             if all(v is None for v in [a,b,c]) and (None in (a,b,c)):
-                raise BalanceError
+                raise BalanceError("zero",a,b,c)
             elif clarke.checkBalance(a,b,c):
                 return beta_bal()
             else:
                 return beta_unbal(a,b,c)
 
-        except BalanceError:
-            print("Balanced value violated")
+        except BalanceError as e:
+            #print(traceback.print_exc())
+            print(e.code)
+            sys.exit(1)
 
 
     #This updates the instance methods
-    def __alpha_calq(self, a, b, c):
+    def __alpha_calq(self, a=None, b=None, c=None):
         self.alpha = clarke.alpha_calq(a,b,c)
         return self.alpha
 
-    def __beta_calq(self, a, b, c):
+    def __beta_calq(self, a=None, b=None, c=None):
         self.beta = clarke.beta_calq(a,b,c)
         return self.beta
 
-    def __zero_calq(self, a, b, c):
+    def __zero_calq(self, a=None, b=None, c=None):
         self.zero = clarke.zero_calq(a,b,c)
         return self.zero
+
