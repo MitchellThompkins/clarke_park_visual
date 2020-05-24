@@ -27,7 +27,6 @@ class BalanceError(Error):
 class clarke:
 
     def __init__(self, a, b, c=None):
-
         self.a = a
         self.b = b
         self.c = c
@@ -43,9 +42,15 @@ class clarke:
         self.zero_calq = self.__zero_calq
 
         #Update the member vars
-        self.alpha_calq(a,b,c)
-        self.beta_calq(a,b,c)
-        self.zero_calq(a,b,c)
+        if self.bal is True:
+            self.alpha_calq(a)
+            self.beta_calq(a,b)
+            self.zero_calq()
+        else:
+            self.alpha_calq(a,b,c)
+            self.beta_calq(a,b,c)
+            self.zero_calq(a,b,c)
+
 
     @staticmethod
     def checkBalance(a,b,c):
@@ -61,6 +66,8 @@ class clarke:
             return result
         return func
 
+    #TODO(mthompkins): Change this to an inherited class. It's a lot of
+    #replicated code structure!
     @staticmethod
     def alpha_calq(a, b=None, c=None):
         def alpha_bal(a):
@@ -69,17 +76,25 @@ class clarke:
         def alpha_unbal(a,b,c):
            return (2/3)*(a - 0.5*(b + c))
 
-        try:
+        def balAssumptionBad(a,b,c):
             if a is None:
-                raise BalanceError("alpha",a)
+                return True
             elif b is None and c is not None:
-                raise BalanceError("alpha",b,c)
+                return True
             elif c is None and b is not None:
-                raise BalanceError("alpha",c,b)
-            elif b is None and c is None:
-                return a
+                return True
+            else:
+                return False
+
+        try:
+            #any Nonetypes? Assume a balanced assumption is being made
+            if any(v is None for v in [a,b,c]):
+                if balAssumptionBad(a,b,c):
+                    raise BalanceError("alpha",a,b,c)
+                else:
+                    return alpha_bal(a)
             elif clarke.checkBalance(a,b,c):
-                return alpha_bal(a)
+                return alpha_bal(a,b,c)
             else:
                 return alpha_unbal(a,b,c)
 
@@ -95,18 +110,25 @@ class clarke:
         def beta_unbal(b,c):
            return (2/3) * (math.sqrt(3)*0.5) * (b-c)
 
-        try:
+        def balAssumptionBad(a,b,c):
             if a is None or b is None:
-                raise BalanceError("beta",a,b)
-            elif c is None:
-                return (math.sqrt(3)*(a+b)/3) + (math.sqrt(3)*b/3)
+                return True
+            else:
+                return False
+
+        try:
+            #any Nonetypes? Assume a balanced assumption is being made
+            if any(v is None for v in [a,b,c]):
+                if balAssumptionBad(a,b,c):
+                    raise BalanceError("beta",a,b,c)
+                else:
+                    return beta_bal(a,b)
             elif clarke.checkBalance(a,b,c):
                 return beta_bal(a,b)
             else:
                 return beta_unbal(b,c)
 
         except BalanceError as e:
-            #print(traceback.print_exc())
             print(e.code)
             sys.exit(1)
 
@@ -118,16 +140,25 @@ class clarke:
         def zero_unbal(a,b,c):
             return (2/3)*0.5*(a+b+c)
 
+        def balAssumptionBad(a,b,c):
+            noneCount = sum(v is None for v in [a,b,c])
+            if noneCount != 3 and noneCount != 0:
+                return True
+            else:
+                return False
+
         try:
-            if all(v is None for v in [a,b,c]) and (None in (a,b,c)):
-                raise BalanceError("zero",a,b,c)
+            if any(v is None for v in [a,b,c]):
+                if balAssumptionBad(a,b,c):
+                    raise BalanceError("zero",a,b,c)
+                else:
+                    return zero_bal()
             elif clarke.checkBalance(a,b,c):
-                return zero_bal()
+                return zero_bal(a,b)
             else:
                 return zero_unbal(a,b,c)
 
         except BalanceError as e:
-            #print(traceback.print_exc())
             print(e.code)
             sys.exit(1)
 
