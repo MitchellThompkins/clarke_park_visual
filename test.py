@@ -78,6 +78,21 @@ class TestClarkeTransform(unittest.TestCase):
         self.assertAlmostEqual(transform.beta, expectedBetaStatic)
         self.assertAlmostEqual(transform.zero, expectedZeroStatic)
 
+    def testCheckBalanced(self):
+        a = 51
+        b = -10
+        c = -41
+
+        transform = clarke(a, b, c)
+
+        expectedAlpha = 51
+        expectedBeta = 17.8978583449
+        expectedZero = 0
+
+        self.assertAlmostEqual(transform.alpha, expectedAlpha)
+        self.assertAlmostEqual(transform.beta, expectedBeta)
+        self.assertAlmostEqual(transform.zero, expectedZero)
+
 
 if __name__ == '__main__':
     unittest.main()

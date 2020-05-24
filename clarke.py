@@ -62,13 +62,12 @@ class clarke:
         return func
 
     @staticmethod
-    @scale
     def alpha_calq(a, b=None, c=None):
-        def alpha_bal(a,b):
+        def alpha_bal(a):
            return a
 
         def alpha_unbal(a,b,c):
-           return a - 0.5*(b + c)
+           return (2/3)*(a - 0.5*(b + c))
 
         try:
             if a is None:
@@ -80,7 +79,7 @@ class clarke:
             elif b is None and c is None:
                 return a
             elif clarke.checkBalance(a,b,c):
-                return alpha_bal(a,b,c)
+                return alpha_bal(a)
             else:
                 return alpha_unbal(a,b,c)
 
@@ -89,13 +88,12 @@ class clarke:
             sys.exit(1)
 
     @staticmethod
-    @scale
     def beta_calq(a, b, c=None):
         def beta_bal(a,b):
            return (math.sqrt(3)*(a+b)/3) + (math.sqrt(3)*b/3)
 
         def beta_unbal(b,c):
-           return (math.sqrt(3)*0.5) * (b-c)
+           return (2/3) * (math.sqrt(3)*0.5) * (b-c)
 
         try:
             if a is None or b is None:
@@ -113,21 +111,20 @@ class clarke:
             sys.exit(1)
 
     @staticmethod
-    @scale
     def zero_calq(a=None, b=None, c=None):
-        def beta_bal():
+        def zero_bal():
             return 0
 
-        def beta_unbal(a,b,c):
-            return 0.5*(a+b+c)
+        def zero_unbal(a,b,c):
+            return (2/3)*0.5*(a+b+c)
 
         try:
             if all(v is None for v in [a,b,c]) and (None in (a,b,c)):
                 raise BalanceError("zero",a,b,c)
             elif clarke.checkBalance(a,b,c):
-                return beta_bal()
+                return zero_bal()
             else:
-                return beta_unbal(a,b,c)
+                return zero_unbal(a,b,c)
 
         except BalanceError as e:
             #print(traceback.print_exc())
