@@ -68,7 +68,6 @@ class clarke:
            return a
 
         def alpha_unbal(a,b,c):
-           print(a)
            return a - 0.5*(b + c)
 
         try:
@@ -86,7 +85,6 @@ class clarke:
                 return alpha_unbal(a,b,c)
 
         except BalanceError as e:
-            #print(traceback.print_exc())
             print(e.code)
             sys.exit(1)
 
