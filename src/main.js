@@ -1,32 +1,31 @@
+var xOffset = 100;
+var yOffset = 100;
+var scaling = 2;
+
+function plotClarke()
+{
+
+    strokeWeight(4);
+    stroke(51);
+
+    a = 1;
+    b = -0.5;
+    c = -0.5;
+
+    clarke = new ClarkeTransform(a,b,c);
+
+    origin = createVector( xOffset, yOffset );
+    clarkeVec = createVector( clarke.alpha, clarke.alpha );
+
+    line(origin.x, origin.y, scaling*(origin.x+clarkeVec.x), scaling*(origin.y+clarkeVec.y));
+}
+
 function setup()
 {
-    createCanvas(640, 480);
+    createCanvas(500,500);
 }
 
 function draw()
 {
-    strokeWeight(4);
-    stroke(51);
-
-    rec = new Rectangle(10,40);
-
-    rect(30, 20, rec.width, rec.height);
-    line(30, 40, 30, 75);
-
-    //xfrm = new ClarkeTransform(11,27,30);
-    xfrm = new ClarkeTransform(51,-10,-41);
-    xfrm = new ClarkeTransform(51,-10);
-
-    print(xfrm.alpha);
-    print(xfrm.beta);
-    print(xfrm.zero);
-    //print(ClarkeTransform.alpha(11,27,30));
-    //print(xfrm.alpha);
-    xfrm.update(8,4,-2);
-
-    print(xfrm.alpha);
-    print(xfrm.beta);
-    print(xfrm.zero);
-
-    
+    plotClarke()
 }
